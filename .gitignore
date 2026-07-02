@@ -1,0 +1,6 @@
+dkim_mail_authentifications_app_private.pem
+envois.log
+listtemp
+delais_mx_ovh.json
+listes_mx_ovh/
+.DS_Store
