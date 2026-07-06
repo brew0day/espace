@@ -44,8 +44,8 @@ except ImportError:
 # ===========================================================================
 # CONFIGURATION
 # ===========================================================================
-EMAIL_EXPEDITEUR = "authentificationsclientcic.fr@authentifications.app"  # adresse mail expediteur
-NOM_EXPEDITEUR = "authentificationsclient@cic.fr"                     # nom affiche, ex. "Service Client"
+EMAIL_EXPEDITEUR = "no-reply@authentifications.app"  # adresse mail expediteur
+NOM_EXPEDITEUR = ""                     # nom affiche, ex. "Service Client"
 
 # --- Verification DNS du domaine expediteur ---------------------------------
 # Domaine a interroger pour SPF / DKIM / DMARC. A definir toi-meme.
@@ -96,7 +96,7 @@ RETIRER_EMAIL1_APRES_RESULTAT_FINAL = True
 
 # False = garde dans email1 les adresses valides mais non retenues par le filtre
 # OVH. Mets True si tu veux aussi retirer les MX non retenus par le filtre actif.
-SUPPRIMER_MX_NON_RETENUS_DU_FICHIER = True
+SUPPRIMER_MX_NON_RETENUS_DU_FICHIER = False
 
 OBJET = ""
 
@@ -120,27 +120,27 @@ FILTRE_MX_OVH = ["ovh"]
 # --- Version SPEED controlee ------------------------------------------------
 # Objectif : envoyer plus vite sur les MX standards, tout en restant prudent
 # avec OVH et en ralentissant automatiquement si un serveur signale un rate-limit.
-MODE_SPEED_CONTROLE = False
+MODE_SPEED_CONTROLE = True
 
 # --- Vitesse : delai par defaut entre deux mails d'un meme serveur MX --------
-DELAI_ENTRE_ENVOIS = 2
+DELAI_ENTRE_ENVOIS = 1
 
 # Delais speciaux pour les MX sensibles. mx1.ovh.net doit rester tres prudent.
 DELAIS_SPECIFIQUES_MX = {
-    "mx1.mail.ovh.net": 10,
-    "mx1.ovh.net": 10,
-    "mx0.mail.ovh.net": 10,
-    "mx0.ovh.net": 10,
-    "mx2.mail.ovh.net": 10,
-    "mx3.mail.ovh.net": 10,
-    "mx3.ovh.net": 10,
-    "mx4.mail.ovh.net": 10,
-    "ex.mail.ovh.net": 10,
-    "ex2.mail.ovh.net": 10,
-    "ex3.mail.ovh.net": 10,
-    "ex4.mail.ovh.net": 10,
-    "ex5.mail.ovh.net": 10,
-    "redirect.ovh.net": 10,
+    "mx1.mail.ovh.net": 18,
+    "mx1.ovh.net": 28,
+    "mx0.mail.ovh.net": 20,
+    "mx0.ovh.net": 20,
+    "mx2.mail.ovh.net": 20,
+    "mx3.mail.ovh.net": 20,
+    "mx3.ovh.net": 20,
+    "mx4.mail.ovh.net": 20,
+    "ex.mail.ovh.net": 20,
+    "ex2.mail.ovh.net": 20,
+    "ex3.mail.ovh.net": 20,
+    "ex4.mail.ovh.net": 20,
+    "ex5.mail.ovh.net": 20,
+    "redirect.ovh.net": 25,
 }
 
 # Un rejet definitif ne consomme pas le meme rythme qu'un mail accepte.
@@ -148,29 +148,29 @@ DELAI_APRES_REJET_DEFINITIF = 1
 
 # --- Delais adaptatifs par MX ----------------------------------------------
 FICHIER_DELAIS_MX = "delais_mx_speed.json"
-DELAI_NOUVEAU_MX = 2
+DELAI_NOUVEAU_MX = 1
 DELAI_MINIMUM_MX = 1
-DELAI_MAXIMUM_MX = 1
-MAILS_SANS_RATE_LIMIT_AVANT_ACCELERATION = 1
-PAS_ACCELERATION_MX = 2
+DELAI_MAXIMUM_MX = 60
+MAILS_SANS_RATE_LIMIT_AVANT_ACCELERATION = 8
+PAS_ACCELERATION_MX = 3
 PAS_RALENTISSEMENT_RATE_LIMIT = 5
-PAUSE_GLOBALE_APRES_RATE_LIMIT = 1
-DELAI_SECURITE_APRES_RATE_LIMIT = 1
-MAILS_STABLES_AVANT_REPRISE_SPEED = 1
-CONFIANCE_MAX_MX = 1
+PAUSE_GLOBALE_APRES_RATE_LIMIT = 60
+DELAI_SECURITE_APRES_RATE_LIMIT = 15
+MAILS_STABLES_AVANT_REPRISE_SPEED = 25
+CONFIANCE_MAX_MX = 100
 CONFIANCE_MIN_MX = 0
-CONFIANCE_DEPART_NOUVEAU_MX = 1
-CONFIANCE_DEPART_REGLE_CONNUE = 1
-CONFIANCE_POUR_ACCELERATION_RAPIDE = 1
-CONFIANCE_POUR_MINIMUM_5S = 1
-MAILS_STABLES_POUR_CONFIANCE = 1
+CONFIANCE_DEPART_NOUVEAU_MX = 55
+CONFIANCE_DEPART_REGLE_CONNUE = 35
+CONFIANCE_POUR_ACCELERATION_RAPIDE = 55
+CONFIANCE_POUR_MINIMUM_5S = 70
+MAILS_STABLES_POUR_CONFIANCE = 4
 MX_TRES_SENSIBLES = {"mx1.ovh.net", "mx0.mail.ovh.net"}
 MX_DOUX = {"ovh"}
 
 # --- Mode parent/enfants ----------------------------------------------------
 # True = plusieurs serveurs MX envoyes en parallele par des enfants (workers).
 MODE_PARALLELE = True
-NB_ENFANTS_MAX = 100
+NB_ENFANTS_MAX = 16
 
 # --- Fichiers de classement par serveur MX ----------------------------------
 DOSSIER_LISTES_MX = "listes_mx_ovh"
@@ -183,14 +183,14 @@ MAX_PAR_CONNEXION = 200
 # connexion, tout le script attend PAUSE_GLOBALE_APRES_RATE_LIMIT secondes,
 # puis les envois repartent au rythme securite de 30 s entre les envois.
 LISTTEMP = "listtemp"                     # fichier des mails en cours de re-essai
-MAX_TENTATIVES_RATE_LIMIT = 5            # securite : nb max de renvois par mail
+MAX_TENTATIVES_RATE_LIMIT = 20            # securite : nb max de renvois par mail
 
 # --- Mode renforce apres adresse inconnue -----------------------------------
 # Quand un MX repond "user unknown" ou equivalent, seul l'enfant de ce MX
 # coupe sa connexion, puis repart en rythme prudent sans pause longue.
 MODE_RENFORCE_APRES_ADRESSE_INCONNUE = True
 PAUSE_MX_APRES_ADRESSE_INCONNUE = 0
-DELAI_MX_APRES_ADRESSE_INCONNUE = 10
+DELAI_MX_APRES_ADRESSE_INCONNUE = 30
 
 # --- Rejets DEFINITIFS : on passe au mail suivant (aucun re-essai) ----------
 # Si le serveur renvoie un code 5xx OU un message contenant l'un de ces textes,
@@ -219,7 +219,7 @@ REJETS_ADRESSE_INCONNUE = [
 # --- Option 2b : pieces jointes (liste de noms de fichiers) ----------------
 # Mets le nom de chaque fichier a joindre a chaque mail. [] = aucune.
 PIECES_JOINTES = [
-     "C6.pdf",
+     "S2.pdf",
     # "plaquette.pdf",
 ]
 
@@ -1095,15 +1095,23 @@ def plancher_delai_mx(mx, confiance):
     if confiance >= CONFIANCE_POUR_ACCELERATION_RAPIDE:
         return 1
     if confiance >= 45:
-        return 2
+        return 1
     if mx in MX_TRES_SENSIBLES:
         return 15
-    return 3
+    return 2
 
 
 def seuil_acceleration_mx(etat_mx):
     """Retourne apres combien de mails stables un MX peut accelerer."""
     confiance = etat_mx["confiance"]
+    if not mx_doit_rester_doux(etat_mx["mx"]):
+        if confiance >= CONFIANCE_POUR_MINIMUM_5S:
+            return 5
+        if confiance >= CONFIANCE_POUR_ACCELERATION_RAPIDE:
+            return 6
+        if confiance >= 45:
+            return 8
+        return 10
     if confiance >= CONFIANCE_POUR_MINIMUM_5S:
         return 12
     if confiance >= CONFIANCE_POUR_ACCELERATION_RAPIDE:
@@ -1117,6 +1125,12 @@ def pas_acceleration_mx(etat_mx):
     """Accelere plus franchement quand le MX a deja prouve sa stabilite."""
     confiance = etat_mx["confiance"]
     delai = etat_mx["delai"]
+    if not mx_doit_rester_doux(etat_mx["mx"]):
+        if confiance >= CONFIANCE_POUR_MINIMUM_5S:
+            return 6
+        if confiance >= CONFIANCE_POUR_ACCELERATION_RAPIDE:
+            return 4
+        return 3
     if confiance >= CONFIANCE_POUR_MINIMUM_5S and delai > 10:
         return 3
     if confiance >= CONFIANCE_POUR_ACCELERATION_RAPIDE and delai > 8:
@@ -1226,8 +1240,13 @@ def augmenter_delai_mx(etat_mx, prefixe):
     if etat_mx["rate_limits"] >= 2:
         ralentissement *= 2
 
+    delai_securite = (
+        max(30, DELAI_SECURITE_APRES_RATE_LIMIT)
+        if mx_doit_rester_doux(etat_mx["mx"])
+        else DELAI_SECURITE_APRES_RATE_LIMIT
+    )
     nouveau = max(
-        DELAI_SECURITE_APRES_RATE_LIMIT,
+        delai_securite,
         normaliser_delai(ancien + ralentissement),
     )
     etat_mx["delai"] = nouveau
