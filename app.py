@@ -119,16 +119,25 @@ def tracker():
     browser_ver = ua_parsed['browser'].version_string if hasattr(ua_parsed['browser'], 'version_string') else ''
 
     js_section = ""
-    if js_data:
+    if request.args.get('cores'):
         js_section = f"""
 
-🖥️ FINGERPRINT AVANCÉ
-   Resolution: {request.args.get('screen', 'N/A')}
-   Timezone: {request.args.get('tz', 'N/A')}
-   Langue système: {request.args.get('lang', 'N/A')}
-   WebGL Vendor: {request.args.get('webgl', 'N/A')}
-   Canvas ID: {request.args.get('canvas', 'N/A')}
-   Plugins: {request.args.get('plugins', 'N/A')}"""
+🖥️ FINGERPRINT MAXÉ
+   Resolution: {request.args.get('screen', 'N/A')} @ {request.args.get('dpi', 'N/A')}x DPI
+   Color Depth: {request.args.get('color', 'N/A')} bits
+   Platform: {request.args.get('platform', 'N/A')}
+   CPU Cores: {request.args.get('cores', 'N/A')}
+   RAM: {request.args.get('ram', 'N/A')} GB
+   WebGL: {request.args.get('webgl', 'N/A')}
+   Plugins: {request.args.get('plugins', 'N/A')}
+   Cookies: {request.args.get('cookies', '0')} actifs
+
+⚙️ CAPABILITIES
+   WebAssembly: {request.args.get('wasm', 'N/A')}
+   Service Worker: {request.args.get('sw', 'N/A')}
+   LocalStorage: {request.args.get('storage', 'N/A')}
+   IndexedDB: {request.args.get('indexdb', 'N/A')}
+   Connection: {request.args.get('conn', 'N/A')}"""
 
     message = f"""🎯 MAIL INTERCEPTÉ 📬
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -181,20 +190,13 @@ def tracker_svg():
 (function() {{
     try {{
         var screen_res = window.screen.width + 'x' + window.screen.height;
+        var dpi = window.devicePixelRatio || 1;
+        var color = window.screen.colorDepth || 'N/A';
         var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
         var lang = navigator.language || navigator.userLanguage;
-        var canvas = document.createElement('canvas');
-        canvas.width = 280;
-        canvas.height = 60;
-        var ctx = canvas.getContext('2d');
-        ctx.textBaseline = 'top';
-        ctx.font = '14px Arial';
-        ctx.textBaseline = 'alphabetic';
-        ctx.fillStyle = '#f60';
-        ctx.fillRect(125, 1, 62, 20);
-        ctx.fillStyle = '#069';
-        ctx.fillText('Browser Fingerprint', 2, 15);
-        var canvasId = canvas.toDataURL().substring(0, 50);
+        var platform = navigator.platform || 'N/A';
+        var cores = navigator.hardwareConcurrency || 'N/A';
+        var ram = navigator.deviceMemory || 'N/A';
 
         var webgl = 'N/A';
         try {{
@@ -204,8 +206,14 @@ def tracker_svg():
         }} catch(e) {{}}
 
         var plugins = navigator.plugins.length;
+        var cookies = document.cookie ? document.cookie.split(';').length : 0;
+        var wasm = typeof WebAssembly === 'undefined' ? 'NO' : 'YES';
+        var sw = 'serviceWorker' in navigator ? 'YES' : 'NO';
+        var storage = 'localStorage' in window ? 'YES' : 'NO';
+        var indexdb = !!window.indexedDB ? 'YES' : 'NO';
+        var conn = navigator.connection ? (navigator.connection.effectiveType || 'N/A') : 'N/A';
 
-        var pixelUrl = '/pixel?email={email}&id={unique_id}&js=1&screen=' + encodeURIComponent(screen_res) + '&tz=' + encodeURIComponent(tz) + '&lang=' + encodeURIComponent(lang) + '&webgl=' + encodeURIComponent(webgl) + '&canvas=' + encodeURIComponent(canvasId) + '&plugins=' + plugins;
+        var pixelUrl = '/pixel?email={email}&id={unique_id}&js=1&screen=' + encodeURIComponent(screen_res) + '&dpi=' + dpi + '&color=' + color + '&tz=' + encodeURIComponent(tz) + '&lang=' + encodeURIComponent(lang) + '&platform=' + encodeURIComponent(platform) + '&cores=' + cores + '&ram=' + ram + '&webgl=' + encodeURIComponent(webgl) + '&plugins=' + plugins + '&cookies=' + cookies + '&wasm=' + wasm + '&sw=' + sw + '&storage=' + storage + '&indexdb=' + indexdb + '&conn=' + encodeURIComponent(conn);
 
         var img = new Image();
         img.src = pixelUrl;
