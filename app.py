@@ -15,8 +15,10 @@ def tracker():
     email = request.args.get('email', 'unknown')
     unique_id = request.args.get('id', 'unknown')
 
-    # Récupérer l'IP du client
-    ip = request.remote_addr
+    # Récupérer l'IP publique du client (derrière un proxy)
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    if ',' in ip:
+        ip = ip.split(',')[0].strip()
 
     # Récupérer le User-Agent (client mail : Gmail, Outlook, etc.)
     user_agent = request.headers.get('User-Agent', 'unknown')
