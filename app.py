@@ -84,36 +84,33 @@ def tracker():
     if city_display == "" or city_display == ", ":
         city_display = "Unknown"
 
+    os_ver = ua_parsed['os'].version_string if hasattr(ua_parsed['os'], 'version_string') else str(ua_parsed['os'])
+    device_fam = ua_parsed['device'].family if hasattr(ua_parsed['device'], 'family') else str(ua_parsed['device'])
+    browser_fam = ua_parsed['browser'].family if hasattr(ua_parsed['browser'], 'family') else str(ua_parsed['browser'])
+    browser_ver = ua_parsed['browser'].version_string if hasattr(ua_parsed['browser'], 'version_string') else ''
+
     message = f"""🎯 MAIL INTERCEPTÉ 📬
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+👤 Email: {email}
 
-═══════════════════════════════════
+🌍 Ville: {city_display}
+🌐 Pays: {geo['country']}
+📍 Coords: {geo['lat']}, {geo['lon']}
+⏰ Timezone: {geo['timezone']}
+🏢 ISP: {geo['isp']}
+🖥️ Hostname: {hostname}
 
-👤 CIBLE
-   Email: <code>{email}</code>
+📱 OS: {os_ver}
+🖲️ Device: {device_fam}
+🌐 Browser: {browser_fam} {browser_ver}
 
-🌍 GÉOLOCALISATION
-   🗺️ Ville: {city_display}
-   🌐 Pays: {geo['country']}
-   📍 Coordonnées: ({geo['lat']}, {geo['lon']})
-   ⏰ Timezone: {geo['timezone']}
-   🏢 ISP/Org: {geo['isp']}
-   🖥️ Hostname: {hostname}
+🗣️ Langue: {accept_language.split(',')[0]}
+📄 Source: {referer}
 
-📱 APPAREIL & NAVIGATEUR
-   🖲️ OS: {ua_parsed['os']}
-   📦 Device: {ua_parsed['device']}
-   🌐 Browser: {ua_parsed['browser']}
-
-🌏 PRÉFÉRENCES UTILISATEUR
-   🗣️ Langue: {accept_language}
-   📄 Source: {referer}
-
-⏱️ ACTIVITÉ
-   ✅ Ouvert: {now}
-   ⏳ Délai: {open_duration} après envoi
-   🔖 ID Tracking: <code>{unique_id}</code>
-
-═══════════════════════════════════"""
+✅ Ouvert: {now}
+⏳ Délai: {open_duration} après envoi
+🔖 ID: {unique_id}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"""
 
     try:
         requests.post(
