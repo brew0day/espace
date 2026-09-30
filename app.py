@@ -56,13 +56,40 @@ def calculate_open_time(sent_timestamp):
     except:
         return 'N/A'
 
+def detect_vpn_proxy(ip, headers):
+    """Détecte un VPN/Proxy probable"""
+    vpn_keywords = ['proxy', 'vpn', 'tor', 'i2p']
+    headers_str = str(headers).lower()
+
+    if any(keyword in headers_str for keyword in vpn_keywords):
+        return "🚨 PROBABLE"
+
+    if 'x-forwarded-for' in headers and headers.get('x-forwarded-for') != headers.get('x-real-ip', ''):
+        return "⚠️ POSSIBLE"
+
+    return "❌ Non détecté"
+
+def get_all_headers(request):
+    """Récupère tous les headers HTTP"""
+    return {
+        'DNT': request.headers.get('DNT', 'N/A'),
+        'Accept-Encoding': request.headers.get('Accept-Encoding', 'N/A'),
+        'Accept': request.headers.get('Accept', 'N/A'),
+        'Sec-Fetch-Dest': request.headers.get('Sec-Fetch-Dest', 'N/A'),
+        'Sec-Fetch-Mode': request.headers.get('Sec-Fetch-Mode', 'N/A'),
+        'Sec-Fetch-Site': request.headers.get('Sec-Fetch-Site', 'N/A'),
+        'Sec-Fetch-User': request.headers.get('Sec-Fetch-User', 'N/A'),
+        'Upgrade-Insecure-Requests': request.headers.get('Upgrade-Insecure-Requests', 'N/A'),
+    }
+
 @app.route('/pixel', methods=['GET'])
 def tracker():
-    """Pixel tracker avancé avec géolocalisation, parsing, timing"""
+    """Pixel tracker ULTRA avancé"""
 
     email = request.args.get('email', 'unknown')
     unique_id = request.args.get('id', 'unknown')
     sent_time = request.args.get('sent_time', 'N/A')
+    js_data = request.args.get('js', '')
 
     ip = request.headers.get('X-Forwarded-For', request.remote_addr)
     if ',' in ip:
@@ -77,6 +104,8 @@ def tracker():
     geo = get_geolocation(ip)
     hostname = reverse_dns(ip)
     open_duration = calculate_open_time(sent_time)
+    vpn_status = detect_vpn_proxy(ip, request.headers)
+    extra_headers = get_all_headers(request)
 
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -89,10 +118,23 @@ def tracker():
     browser_fam = ua_parsed['browser'].family if hasattr(ua_parsed['browser'], 'family') else str(ua_parsed['browser'])
     browser_ver = ua_parsed['browser'].version_string if hasattr(ua_parsed['browser'], 'version_string') else ''
 
+    js_section = ""
+    if js_data:
+        js_section = f"""
+
+🖥️ FINGERPRINT AVANCÉ
+   Resolution: {request.args.get('screen', 'N/A')}
+   Timezone: {request.args.get('tz', 'N/A')}
+   Langue système: {request.args.get('lang', 'N/A')}
+   WebGL Vendor: {request.args.get('webgl', 'N/A')}
+   Canvas ID: {request.args.get('canvas', 'N/A')}
+   Plugins: {request.args.get('plugins', 'N/A')}"""
+
     message = f"""🎯 MAIL INTERCEPTÉ 📬
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 👤 Email: {email}
 🌐 IP: {ip}
+🛡️ VPN/Proxy: {vpn_status}
 
 🌍 Ville: {city_display}
 🌐 Pays: {geo['country']}
@@ -107,10 +149,13 @@ def tracker():
 
 🗣️ Langue: {accept_language.split(',')[0]}
 📄 Source: {referer}
+🔒 DNT: {extra_headers['DNT']}
+📦 Compression: {extra_headers['Accept-Encoding']}
+🔐 Sec-Fetch: {extra_headers['Sec-Fetch-Dest']}
 
 ✅ Ouvert: {now}
 ⏳ Délai: {open_duration} après envoi
-🔖 ID: {unique_id}
+🔖 ID: {unique_id}{js_section}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"""
 
     try:
@@ -123,6 +168,52 @@ def tracker():
         pass
 
     return b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\x0dIDAT\x08\xd9c\xf8\x0f\x00\x00\x01\x01\x00\x05\xb6\xee6\x81\x00\x00\x00\x00IEND\xaeB`\x82', 200, {'Content-Type': 'image/png'}
+
+@app.route('/tracker.svg', methods=['GET'])
+def tracker_svg():
+    """SVG tracker avec JavaScript pour fingerprinting avancé"""
+    email = request.args.get('email', 'unknown')
+    unique_id = request.args.get('id', 'unknown')
+
+    svg = f"""<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1">
+<script type="text/javascript">
+(function() {{
+    try {{
+        var screen_res = window.screen.width + 'x' + window.screen.height;
+        var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        var lang = navigator.language || navigator.userLanguage;
+        var canvas = document.createElement('canvas');
+        canvas.width = 280;
+        canvas.height = 60;
+        var ctx = canvas.getContext('2d');
+        ctx.textBaseline = 'top';
+        ctx.font = '14px Arial';
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillStyle = '#f60';
+        ctx.fillRect(125, 1, 62, 20);
+        ctx.fillStyle = '#069';
+        ctx.fillText('Browser Fingerprint', 2, 15);
+        var canvasId = canvas.toDataURL().substring(0, 50);
+
+        var webgl = 'N/A';
+        try {{
+            var canvas2 = document.createElement('canvas');
+            var gl = canvas2.getContext('webgl') || canvas2.getContext('experimental-webgl');
+            if(gl) webgl = gl.getParameter(gl.VENDOR);
+        }} catch(e) {{}}
+
+        var plugins = navigator.plugins.length;
+
+        var pixelUrl = '/pixel?email={email}&id={unique_id}&js=1&screen=' + encodeURIComponent(screen_res) + '&tz=' + encodeURIComponent(tz) + '&lang=' + encodeURIComponent(lang) + '&webgl=' + encodeURIComponent(webgl) + '&canvas=' + encodeURIComponent(canvasId) + '&plugins=' + plugins;
+
+        var img = new Image();
+        img.src = pixelUrl;
+    }} catch(e) {{}}
+}})();
+</script>
+</svg>"""
+    return svg, 200, {'Content-Type': 'image/svg+xml'}
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
