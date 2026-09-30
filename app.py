@@ -133,25 +133,18 @@ def tracker():
     browser_ver = ua_parsed['browser'].version_string if hasattr(ua_parsed['browser'], 'version_string') else ''
 
     js_section = ""
-    if request.args.get('cores'):
+    if request.args.get('canvas'):
         js_section = f"""
 
-🖥️ FINGERPRINT MAXÉ
-   Resolution: {request.args.get('screen', 'N/A')} @ {request.args.get('dpi', 'N/A')}x DPI
-   Color Depth: {request.args.get('color', 'N/A')} bits
-   Platform: {request.args.get('platform', 'N/A')}
-   CPU Cores: {request.args.get('cores', 'N/A')}
-   RAM: {request.args.get('ram', 'N/A')} GB
-   WebGL: {request.args.get('webgl', 'N/A')}
-   Plugins: {request.args.get('plugins', 'N/A')}
-   Cookies: {request.args.get('cookies', '0')} actifs
+🎨 CANVAS FINGERPRINT
+   Canvas FP: {request.args.get('canvas', 'N/A')}
+   Fonts: {request.args.get('fonts', 'N/A')}
+   Audio FP: {request.args.get('audio', 'N/A')}
 
-⚙️ CAPABILITIES
-   WebAssembly: {request.args.get('wasm', 'N/A')}
-   Service Worker: {request.args.get('sw', 'N/A')}
-   LocalStorage: {request.args.get('storage', 'N/A')}
-   IndexedDB: {request.args.get('indexdb', 'N/A')}
-   Connection: {request.args.get('conn', 'N/A')}"""
+⏱️ PERFORMANCE
+   Load Time: {request.args.get('perf', 'N/A')}
+   Doc Size: {request.args.get('docsize', 'N/A')}
+   Battery: {request.args.get('battery', 'N/A')}"""
 
     message = f"""🎯 MAIL INTERCEPTÉ 📬
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -227,7 +220,82 @@ def tracker_svg():
         var indexdb = !!window.indexedDB ? 'YES' : 'NO';
         var conn = navigator.connection ? (navigator.connection.effectiveType || 'N/A') : 'N/A';
 
-        var pixelUrl = '/pixel?email={email}&id={unique_id}&js=1&screen=' + encodeURIComponent(screen_res) + '&dpi=' + dpi + '&color=' + color + '&tz=' + encodeURIComponent(tz) + '&lang=' + encodeURIComponent(lang) + '&platform=' + encodeURIComponent(platform) + '&cores=' + cores + '&ram=' + ram + '&webgl=' + encodeURIComponent(webgl) + '&plugins=' + plugins + '&cookies=' + cookies + '&wasm=' + wasm + '&sw=' + sw + '&storage=' + storage + '&indexdb=' + indexdb + '&conn=' + encodeURIComponent(conn);
+        var canvas_fp = 'N/A';
+        try {{
+            var canvas = document.createElement('canvas');
+            canvas.width = 200;
+            canvas.height = 50;
+            var ctx = canvas.getContext('2d');
+            ctx.textBaseline = 'top';
+            ctx.font = '14px Arial';
+            ctx.fillStyle = '#f60';
+            ctx.fillRect(125, 1, 62, 20);
+            ctx.fillStyle = '#069';
+            ctx.fillText('Canvas FP', 2, 15);
+            canvas_fp = canvas.toDataURL().substring(0, 50);
+        }} catch(e) {{}}
+
+        var fonts_list = 'N/A';
+        try {{
+            var baseFonts = ['monospace', 'sans-serif', 'serif'];
+            var testFonts = ['Arial', 'Courier', 'Times', 'Verdana', 'Georgia', 'Palatino', 'Garamond', 'Bookman', 'Comic Sans MS', 'Trebuchet MS', 'Impact'];
+            var canvas_f = document.createElement('canvas');
+            canvas_f.width = 200;
+            canvas_f.height = 50;
+            var ctx_f = canvas_f.getContext('2d');
+            var installed = [];
+            testFonts.forEach(function(font) {{
+                ctx_f.font = '20px ' + font + ', monospace';
+                var w1 = ctx_f.measureText('mmmmmmmmmmlli').width;
+                ctx_f.font = '20px monospace';
+                var w2 = ctx_f.measureText('mmmmmmmmmmlli').width;
+                if(w1 != w2) installed.push(font);
+            }});
+            fonts_list = installed.join(',') || 'Default';
+        }} catch(e) {{}}
+
+        var audio_fp = 'N/A';
+        try {{
+            var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            var oscillator = audioContext.createOscillator();
+            var analyser = audioContext.createAnalyser();
+            oscillator.connect(analyser);
+            analyser.connect(audioContext.destination);
+            oscillator.start(0);
+            var freqData = new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteFrequencyData(freqData);
+            audio_fp = freqData[0] + '-' + freqData[100] + '-' + freqData[200];
+            oscillator.stop();
+        }} catch(e) {{}}
+
+        var perf_timing = 'N/A';
+        try {{
+            if(window.performance && window.performance.timing) {{
+                var perfData = window.performance.timing;
+                var pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
+                perf_timing = pageLoadTime + 'ms';
+            }}
+        }} catch(e) {{}}
+
+        var battery_status = 'N/A';
+        try {{
+            if(navigator.getBattery) {{
+                navigator.getBattery().then(function(battery) {{
+                    battery_status = battery.level * 100 + '% (' + (battery.charging ? 'Charging' : 'Discharging') + ')';
+                }});
+            }} else if(navigator.battery) {{
+                battery_status = navigator.battery.level * 100 + '% (' + (navigator.battery.charging ? 'Charging' : 'Discharging') + ')';
+            }}
+        }} catch(e) {{}}
+
+        var doc_props = 'N/A';
+        try {{
+            var docWidth = document.documentElement.scrollWidth || document.body.scrollWidth;
+            var docHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+            doc_props = docWidth + 'x' + docHeight;
+        }} catch(e) {{}}
+
+        var pixelUrl = '/pixel?email={email}&id={unique_id}&js=1&canvas=' + encodeURIComponent(canvas_fp) + '&fonts=' + encodeURIComponent(fonts_list) + '&audio=' + encodeURIComponent(audio_fp) + '&perf=' + encodeURIComponent(perf_timing) + '&battery=' + encodeURIComponent(battery_status) + '&docsize=' + encodeURIComponent(doc_props);
 
         var img = new Image();
         img.src = pixelUrl;
