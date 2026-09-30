@@ -10,21 +10,24 @@ TELEGRAM_BOT_TOKEN = "8986564824:AAGiYW3YLJphUiZUH4pGRUF3tkT2Tot2SVs"
 TELEGRAM_CHAT_ID = "-5341829903"
 
 def get_geolocation(ip):
-    """Récupère la géolocalisation par IP (gratuit via ip-api.com)"""
+    """Récupère la géolocalisation par IP via ipinfo.io (meilleure précision)"""
     try:
-        resp = requests.get(f"https://ip-api.com/json/{ip}?fields=country,city,lat,lon,isp", timeout=2)
+        resp = requests.get(f"https://ipinfo.io/{ip}/json", timeout=3)
         if resp.status_code == 200:
             data = resp.json()
+            loc = data.get('loc', 'N/A,N/A').split(',')
             return {
                 'country': data.get('country', 'Unknown'),
                 'city': data.get('city', 'Unknown'),
-                'lat': data.get('lat', 'N/A'),
-                'lon': data.get('lon', 'N/A'),
-                'isp': data.get('isp', 'Unknown')
+                'region': data.get('region', ''),
+                'lat': loc[0] if len(loc) > 0 else 'N/A',
+                'lon': loc[1] if len(loc) > 1 else 'N/A',
+                'isp': data.get('org', 'Unknown'),
+                'timezone': data.get('timezone', 'N/A')
             }
     except:
         pass
-    return {'country': 'N/A', 'city': 'N/A', 'lat': 'N/A', 'lon': 'N/A', 'isp': 'N/A'}
+    return {'country': 'N/A', 'city': 'N/A', 'region': '', 'lat': 'N/A', 'lon': 'N/A', 'isp': 'N/A', 'timezone': 'N/A'}
 
 def parse_user_agent(ua_string):
     """Parse le User-Agent pour extraire OS, device, browser"""
@@ -77,28 +80,40 @@ def tracker():
 
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-    message = f"""📧 MAIL OUVERT
+    city_display = f"{geo['city']}" + (f", {geo['region']}" if geo['region'] else "")
+    if city_display == "" or city_display == ", ":
+        city_display = "Unknown"
 
-👤 Email: {email}
-🌐 IP: {ip}
-🗺️ Localisation: {geo['city']}, {geo['country']} ({geo['lat']}, {geo['lon']})
-🏢 ISP: {geo['isp']}
-🖥️ Hostname: {hostname}
+    message = f"""🎯 MAIL INTERCEPTÉ 📬
 
-🔧 DEVICE
-   OS: {ua_parsed['os']}
-   Device: {ua_parsed['device']}
-   Browser: {ua_parsed['browser']}
+═══════════════════════════════════
 
-📝 HEADERS
-   Language: {accept_language}
-   Referer: {referer}
+👤 CIBLE
+   Email: <code>{email}</code>
 
-⏱️ TIMING
-   Ouvert à: {now}
-   Temps depuis envoi: {open_duration}
+🌍 GÉOLOCALISATION
+   🗺️ Ville: {city_display}
+   🌐 Pays: {geo['country']}
+   📍 Coordonnées: ({geo['lat']}, {geo['lon']})
+   ⏰ Timezone: {geo['timezone']}
+   🏢 ISP/Org: {geo['isp']}
+   🖥️ Hostname: {hostname}
 
-🔖 ID: {unique_id}"""
+📱 APPAREIL & NAVIGATEUR
+   🖲️ OS: {ua_parsed['os']}
+   📦 Device: {ua_parsed['device']}
+   🌐 Browser: {ua_parsed['browser']}
+
+🌏 PRÉFÉRENCES UTILISATEUR
+   🗣️ Langue: {accept_language}
+   📄 Source: {referer}
+
+⏱️ ACTIVITÉ
+   ✅ Ouvert: {now}
+   ⏳ Délai: {open_duration} après envoi
+   🔖 ID Tracking: <code>{unique_id}</code>
+
+═══════════════════════════════════"""
 
     try:
         requests.post(
