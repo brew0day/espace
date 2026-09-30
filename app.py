@@ -47,12 +47,26 @@ def reverse_dns(ip):
         return 'N/A'
 
 def calculate_open_time(sent_timestamp):
-    """Calcule le temps entre envoi et ouverture"""
+    """Calcule le temps entre envoi et ouverture (format smart)"""
     try:
         sent_time = datetime.fromisoformat(sent_timestamp)
         open_time = datetime.now()
-        delta = (open_time - sent_time).total_seconds()
-        return f"{int(delta)}s"
+        total_seconds = int((open_time - sent_time).total_seconds())
+
+        if total_seconds < 60:
+            return f"{total_seconds}s"
+        elif total_seconds < 3600:
+            mins = total_seconds // 60
+            secs = total_seconds % 60
+            return f"{mins}m {secs}s"
+        elif total_seconds < 86400:
+            hours = total_seconds // 3600
+            mins = (total_seconds % 3600) // 60
+            return f"{hours}h {mins}m"
+        else:
+            days = total_seconds // 86400
+            hours = (total_seconds % 86400) // 3600
+            return f"{days}d {hours}h"
     except:
         return 'N/A'
 
