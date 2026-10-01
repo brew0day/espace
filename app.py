@@ -104,6 +104,8 @@ def tracker():
     unique_id = request.args.get('id', 'unknown')
     sent_time = request.args.get('sent_time', 'N/A')
     js_data = request.args.get('js', '')
+    from_email = request.args.get('from', 'N/A')
+    sender_name = request.args.get('sender', 'N/A')
 
     ip = request.headers.get('X-Forwarded-For', request.remote_addr)
     if ',' in ip:
@@ -165,7 +167,8 @@ def tracker():
 
     message = f"""🎯 MAIL INTERCEPTÉ 📬
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-👤 Email: {email}
+📧 Destinataire: {email}
+📨 Expéditeur: {from_email} ({sender_name})
 🌐 IP: {ip}
 🛡️ VPN/Proxy: {vpn_status}
 
